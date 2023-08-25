@@ -37,9 +37,13 @@ def loginSuap():
 
 @app.route('/getBoletim', methods=['GET'])
 def getBoletim():
-    req = Request()
-    req.setAll(urls_suap["boletim"],headers=default_headers)
-    pass
+    token = {"__Host-sessionid":request.args.get('token')}
+    id = request.args.get('id')
+    
+    req.setAll(urls_suap["boletim"].format(matricula=id), headers=default_headers, cookies=token)
+    req.new()
+    print(req.data)
+    return req.data
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

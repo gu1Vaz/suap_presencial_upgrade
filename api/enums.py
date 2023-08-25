@@ -1,5 +1,5 @@
 urls_suap = { "login" : "https://suap.ifsuldeminas.edu.br/accounts/login/",
-              "boletim" : "https://suap.ifsuldeminas.edu.br/accounts/login/"}
+              "boletim" : "https://suap.ifsuldeminas.edu.br/edu/aluno/{matricula}/?tab=boletim"}
 
 default_headers = h = {'Content-Type': 'application/x-www-form-urlencoded',
                        'Origin': 'https://suap.ifsuldeminas.edu.br',
