@@ -7,13 +7,13 @@ export const CustomCard = (props)=>{
           key={"dark"}
           text={'white'}
           border={"light"}
-          style={{ width: '18rem' }}
-          className="mb-2"
+          style={{ width: '16rem', minHeight:'7rem' }}
+          className="m-1"
         >
           <Card.Body>
-            <Card.Title>{props.title}</Card.Title>
+            <Card.Title style={{fontSize:'17px'}}>{props.title}</Card.Title>
             <Card.Text>
-                ....
+                {props.data}
             </Card.Text>
           </Card.Body>
         </Card>

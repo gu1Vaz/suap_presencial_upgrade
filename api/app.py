@@ -1,8 +1,10 @@
 from flask import Flask,request
 from modules.Request import Request
 from enums import urls_suap, default_headers
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 req = Request()
 req.enableProxy()
@@ -27,6 +29,7 @@ def loginSuap():
     payload = {'csrfmiddlewaretoken':cookies["__Host-csrftoken"],
 		   'username':request.json.get('username'),
            'password':request.json.get('password')}
+           
 
 
     req.setAll(urls_suap["login"],"post", default_headers, payload, cookies);
@@ -42,8 +45,7 @@ def getBoletim():
     
     req.setAll(urls_suap["boletim"].format(matricula=id), headers=default_headers, cookies=token)
     req.new()
-    print(req.data)
-    return req.data
+    return req.data["response"]
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

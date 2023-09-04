@@ -8,7 +8,10 @@ export default createGlobalStyle`
         font-family: 'Nunito', sans-serif;
 
     }
-    h1,h5{
+    body{
+        background-color: #323234;
+    }
+    span, h1, h2, h3, h4, h5, h6{
         color: white;
     }
     a{

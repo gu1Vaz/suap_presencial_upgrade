@@ -42,6 +42,7 @@ class Request():
 		os.environ['http_proxy'] = self.proxy 
 		os.environ['HTTP_PROXY'] = self.proxy
 		
+		
 	def setProxy(self, href):
 		self.proxy = href
 	
