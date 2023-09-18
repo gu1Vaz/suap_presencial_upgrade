@@ -1,5 +1,6 @@
 import React,{ useRef, useEffect } from 'react';
 import {Container, Icone} from './styles';
+import StickmanRunning from '../StickmanRunning';
 
 const Loading = (props) => {
   
@@ -16,12 +17,11 @@ const Loading = (props) => {
        <Container ref={ref}>
             {props.isPage && 
               <Icone to="/" >
-                  
-                  <h5>IF API</h5>
+                  <StickmanRunning/>
               </Icone>
             }
            <div style={{height:"25px",width:"25px",fontSize:"7px"}}
-                className="spinner-border text-dark" role="status"/>
+                className="spinner-border text-light" role="status"/>
        </Container>
   )
 }

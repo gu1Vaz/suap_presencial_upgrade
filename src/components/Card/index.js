@@ -11,9 +11,9 @@ export const CustomCard = (props)=>{
           className="m-1"
         >
           <Card.Body>
-            <Card.Title style={{fontSize:'17px'}}>{props.title}</Card.Title>
-            <Card.Text>
-                {props.data}
+            <Card.Title style={{fontSize:'18px'}}>{props.title}</Card.Title>
+            <Card.Text>     
+              {props.data}
             </Card.Text>
           </Card.Body>
         </Card>

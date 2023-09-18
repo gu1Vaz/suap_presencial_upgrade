@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Periodo, Periodos, Navbar } from './styles';
+import { Periodos, Periodo, DadosPeriodo, Navbar, Dados , Form} from './styles';
 import { CustomCard } from '../../components/Card';
+import Loading from "../../components/Loading"
 import api from '../../services/api';
 import { periodos } from '../../enums/comp';
 
 const whoPeriod = (d) => {
   for (const i in periodos) {
     for (const j in periodos[i].items) {
-      if (periodos[i].items[j] == d) return periodos[i].name
+      if (periodos[i].items[j] === d) return periodos[i].name
     }
   }
   return "Outros"
@@ -42,18 +43,21 @@ const toArray = (table) => {
 }
 
 const Main = () => {
-  const [username, setUsername] = useState("20211340014")
-  const [password, setPassword] = useState("desireNull1vz2")
+  const [username, setUsername] = useState(localStorage.getItem("username"))
+  const [password, setPassword] = useState(localStorage.getItem("password"))
   const [token, setToken] = useState(null)
-  const [boletim, setBoletim] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [boletim, setBoletim] = useState(null)
 
-  const login = async () => {
+  const login = async () => { 
     try {
       const data = {
         "username": username,
         "password": password
       };
       const response = await api.post("/loginSuap", data);
+      localStorage.setItem("username", username)
+      localStorage.setItem("password", password)
       setToken(response.data["__Host-sessionid"]);
     } catch (error) {
       console.log("erro");
@@ -66,38 +70,54 @@ const Main = () => {
       setBoletim(toArray(documento.querySelector("table")).filter((periodo)=>{return periodo.items.length > 0}))
   };
   useEffect(() => {
-    login();
+    if (username && password) login();
+    else setLoading(false);
   }, []);
+
   useEffect(() => {
     if (token) {
       getBoletim()
     }
-  }, [token, username]);
+  }, [token]);
 
   return (
     <>
       <Navbar>
         <h2>IF Api  </h2>
-      </Navbar>
-      <Periodos>
-        {boletim.map((periodo, index) => (
-          <>
-          <h5>{periodo.name}
-          <Periodo>
-            {periodo.items.map((item, itemIndex) => (
-              <CustomCard key={itemIndex}
-                title={item.disciplina}
-                data={"pagode"}
-              />
-            ))}
-          </Periodo> 
-          </h5>
-          </>
-        ))}
-      </Periodos>
-     
-    </>
+        <h6 className='m-2'>by gui</h6>
+      </Navbar>      
+      {boletim ? 
+        <Periodos>
+          {boletim.map((periodo, index) => (
+            <Periodo key={periodo.name}>
+              <h5 className="mt-4">{periodo.name}</h5>
+              <DadosPeriodo>
+                {periodo.items.map((item, itemIndex) => (
+                  <CustomCard key={itemIndex}
+                    title={item.disciplina}
+                    data={
+                    <Dados>
+                      <h6>{item.freq}</h6>
+                      <h6>{item.tFaltas} faltas / {item.chAula} </h6>
+                      <h6>Max: {parseInt(item.chAula) - (parseInt(item.chAula)*75)/100} faltas</h6>
+                    </Dados>}
+                  />
+                ))}
+              </DadosPeriodo> 
+            </Periodo>
+          ))}
+        </Periodos>:
+        loading? <Loading isPage={true} />:
+        <Form >
+          <input name="username" type="username" placeholder="Username" required
+              onChange={e=>setUsername(e.target.value)} value={username} />
+          <input name="password" type="password" placeholder="Senha" required
+              onChange={e=>setPassword(e.target.value)} value={password} />
 
+          <button onClick={login}>Login</button>
+        </Form>
+      }
+    </>
   );
 };
 
