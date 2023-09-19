@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Periodos, Periodo, DadosPeriodo, Navbar, Dados , Form, DivLogin, Welcome} from './styles';
 import { CustomCard } from '../../components/Card';
+import { Iframe } from '../../components/Iframe';
 import Loading from "../../components/Loading"
 import api from '../../services/api';
 import { periodos } from '../../enums/comp';
@@ -97,6 +98,7 @@ const Main = () => {
       }else{
         localStorage.removeItem("token_suap")
         localStorage.removeItem("suap_expires")
+        setLoading(false);
       }
     }else{
       setLoading(false);
@@ -104,7 +106,6 @@ const Main = () => {
   }, [token]);
   useEffect(() => {
     if (matricula && pass_suap && !token) login();
-    
   }, []);
 
   return (
@@ -133,6 +134,7 @@ const Main = () => {
               </DadosPeriodo> 
             </Periodo>
           ))}
+          <Iframe url={'https://www.microsip.org/downloads'}></Iframe>
         </Periodos>:
         loading? <Loading isPage={true} />:
         <DivLogin>
@@ -141,7 +143,7 @@ const Main = () => {
             <span className='mb-2' >IF API</span>
             <span className='bold'>?login</span>
             <span >-suap usuario e senha</span>
-            <span className='mb-2' >-presencial usuario e senha</span>
+            <span className='mb-2 line' >-presencial usuario e senha</span>
             <span className='mt-5'>...paga uma coquinha pro pae dps 🧐</span>
           </Welcome>
           <Form>
@@ -150,10 +152,10 @@ const Main = () => {
                 onChange={e=>setMatricula(e.target.value)} value={matricula} />
             <input name="pass_suap" type="password" placeholder="Senha" required
                 onChange={e=>setPassSuap(e.target.value)} value={pass_suap} />
-            <h6>Presencial credenciais</h6>
-            <input name="cpf" type="cpf" placeholder="Cpf" required
+            <h6 className='line'>Presencial credenciais</h6>
+            <input disabled={true} name="cpf" type="cpf" placeholder="Cpf" required
                 onChange={e=>setCpf(e.target.value)} value={cpf} />
-            <input name="pass_presencial" type="password" placeholder="Senha" required
+            <input disabled={true} name="pass_presencial" type="password" placeholder="Senha" required
                 onChange={e=>setPassPresencial(e.target.value)} value={pass_presencial} />
             <button onClick={login}>Login</button>
           </Form>

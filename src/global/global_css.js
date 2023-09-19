@@ -21,5 +21,8 @@ export default createGlobalStyle`
         box-shadow: 0 0 0 0 !important;
         outline: 0 !important;
     } 
+    .line {
+        text-decoration: line-through;
+    }
     
 `;

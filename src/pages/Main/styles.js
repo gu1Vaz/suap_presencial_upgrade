@@ -61,6 +61,9 @@ export const Welcome = styled.div`
     .bold{
         font-weight: bold;
     }
+    .line {
+        text-decoration: line-through;
+    }
 `
 export const Form = styled.div`
     display: flex;      
