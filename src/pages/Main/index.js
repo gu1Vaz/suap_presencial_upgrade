@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Periodos, Periodo, DadosPeriodo, Navbar, Dados , Form} from './styles';
+import { Periodos, Periodo, DadosPeriodo, Navbar, Dados , Form, DivLogin, Welcome} from './styles';
 import { CustomCard } from '../../components/Card';
 import Loading from "../../components/Loading"
 import api from '../../services/api';
 import { periodos } from '../../enums/comp';
+import { toast } from 'react-toastify';
 
 const whoPeriod = (d) => {
   for (const i in periodos) {
@@ -43,42 +44,68 @@ const toArray = (table) => {
 }
 
 const Main = () => {
-  const [username, setUsername] = useState(localStorage.getItem("username"))
-  const [password, setPassword] = useState(localStorage.getItem("password"))
-  const [token, setToken] = useState(null)
+  const [matricula, setMatricula] = useState(localStorage.getItem("matricula"))
+  const [pass_suap, setPassSuap] = useState(localStorage.getItem("pass_suap"))
+  const [cpf, setCpf] =  useState(localStorage.getItem("cpf"))
+  const [pass_presencial, setPassPresencial] = useState(localStorage.getItem("pass_presencial"))
+  const [token, setToken] = useState(localStorage.getItem("token_suap"))
+
+  const [today, setToday] = useState(new Date())
   const [loading, setLoading] = useState(true)
   const [boletim, setBoletim] = useState(null)
 
   const login = async () => { 
+    setLoading(true);
     try {
       const data = {
-        "username": username,
-        "password": password
+        "username": matricula,
+        "password": pass_suap
       };
       const response = await api.post("/loginSuap", data);
-      localStorage.setItem("username", username)
-      localStorage.setItem("password", password)
+      console.log(response.data)
+      localStorage.setItem("matricula", matricula)
+      localStorage.setItem("pass_suap", pass_suap)
+      localStorage.setItem("token_suap", response.data["__Host-sessionid"])
+      const tomorrow = new Date(new Date().getTime() + 2 * 60 * 1000);
+      localStorage.setItem("suap_expires", tomorrow)
       setToken(response.data["__Host-sessionid"]);
     } catch (error) {
-      console.log("erro");
+      toast.error("Usuario ou senha incorretos;")
+      localStorage.removeItem("matricula")
+      localStorage.removeItem("pass_suap")
     }
   };
   const getBoletim = async () => {
-      const documento = document.createElement('html');
-      const response = await api.get(`/getBoletim?token=${token}&id=${username}`);
-      documento.innerHTML = response.data
-      setBoletim(toArray(documento.querySelector("table")).filter((periodo)=>{return periodo.items.length > 0}))
+      try {
+        const documento = document.createElement('html');
+        const response = await api.get(`/getBoletim?token=${token}&id=${matricula}`);
+        documento.innerHTML = response.data
+        setBoletim(toArray(documento.querySelector("table")).filter((periodo)=>{return periodo.items.length > 0})) 
+      } catch (error) {
+        toast.error('Usuario ou senha incorretos', {position: "top-center", autoClose: 5000, hideProgressBar: false, closeOnClick: true, pauseOnHover: true, draggable: true, progress: undefined, theme: "colored",});
+        localStorage.removeItem("matricula")
+        localStorage.removeItem("pass_suap")
+        setLoading(false);
+      }
   };
   useEffect(() => {
-    if (username && password) login();
-    else setLoading(false);
-  }, []);
-
-  useEffect(() => {
     if (token) {
-      getBoletim()
+      setLoading(true);
+      let expires = new Date(localStorage.getItem("suap_expires"))
+      if(today < expires){
+        getBoletim()
+      }else{
+        localStorage.removeItem("token_suap")
+        localStorage.removeItem("suap_expires")
+      }
+    }else{
+      setLoading(false);
     }
   }, [token]);
+  useEffect(() => {
+    if (matricula && pass_suap && !token) login();
+    
+  }, []);
 
   return (
     <>
@@ -108,14 +135,29 @@ const Main = () => {
           ))}
         </Periodos>:
         loading? <Loading isPage={true} />:
-        <Form >
-          <input name="username" type="username" placeholder="Username" required
-              onChange={e=>setUsername(e.target.value)} value={username} />
-          <input name="password" type="password" placeholder="Senha" required
-              onChange={e=>setPassword(e.target.value)} value={password} />
-
-          <button onClick={login}>Login</button>
-        </Form>
+        <DivLogin>
+          <Welcome>
+            <span className='bold mb-2'>Bem vindo(a)!</span>
+            <span className='mb-2' >IF API</span>
+            <span className='bold'>?login</span>
+            <span >-suap usuario e senha</span>
+            <span className='mb-2' >-presencial usuario e senha</span>
+            <span className='mt-5'>...paga uma coquinha pro pae dps 🧐</span>
+          </Welcome>
+          <Form>
+            <h6>Suap credenciais</h6>
+            <input name="matricula" type="matricula" placeholder="Usuário: Servidores (Nº SIAPE) / Contratados (CPF) / Alunos (RA)" required
+                onChange={e=>setMatricula(e.target.value)} value={matricula} />
+            <input name="pass_suap" type="password" placeholder="Senha" required
+                onChange={e=>setPassSuap(e.target.value)} value={pass_suap} />
+            <h6>Presencial credenciais</h6>
+            <input name="cpf" type="cpf" placeholder="Cpf" required
+                onChange={e=>setCpf(e.target.value)} value={cpf} />
+            <input name="pass_presencial" type="password" placeholder="Senha" required
+                onChange={e=>setPassPresencial(e.target.value)} value={pass_presencial} />
+            <button onClick={login}>Login</button>
+          </Form>
+        </DivLogin>
       }
     </>
   );

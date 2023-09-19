@@ -38,18 +38,41 @@ export const Dados = styled.div`
         
     }
 `
-
+export const DivLogin = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    margin-top: 5%;
+`
+export const Welcome = styled.div`
+    display: flex;
+    flex-direction: column;
+    border: 1px solid white;
+    color: white;
+    padding: 2%;
+    margin-right: 1%;
+    min-width: 20%;
+    width: 23%;
+    span{
+        font-size: 14px;
+    }
+    .bold{
+        font-weight: bold;
+    }
+`
 export const Form = styled.div`
     display: flex;      
     flex-direction: column;
     margin-top: 10px;
-    min-width: 300px;
-    width: 500px;
+    min-width: 20%;
+    width: 30%;
     input {
         border: 1px solid #eee;
         padding: 10px 15px;
         border-radius: 4px;
-        font-size: 16px;
+        font-size: 14px;
         margin: 5px 0;
     }
     button {
