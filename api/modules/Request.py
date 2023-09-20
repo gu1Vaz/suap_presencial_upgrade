@@ -4,7 +4,7 @@ import time
 
 class Request():
 	enabledProxy = False
-	proxy = "http://specops@10.12.250.247:8080"
+	proxy = "http://specops@10.12.244.238:8080"
 
 	url = ""
 	method= "get"
@@ -20,7 +20,7 @@ class Request():
 	def new(self):
 		try:
 			call = getattr(requests, self.method)
-			r = call(self.url, data=self.payload, headers=self.headers, cookies=self.cookies)
+			r = call(self.url, data=self.payload, headers=self.headers, cookies=self.cookies, allow_redirects=False)
 			
 			response = json.loads(r.text) if self.isJson else r.text;
 			data = {
