@@ -16,7 +16,7 @@ const whoPeriod = (d) => {
   return "Outros"
 }
 
-const toArray = (table) => {
+const cursesToArray = (table) => {
   const rows = table.querySelectorAll('tbody tr');
   let data = structuredClone(periodos).map((periodo)=>{
     periodo.items = []
@@ -43,6 +43,31 @@ const toArray = (table) => {
   console.log(data)
   return data
 }
+
+const atvsToArray = () => {
+  const eventDivs = document.querySelectorAll('.event');
+
+  return Array.from(eventDivs).map((eventDiv) => {
+    const dataCourseId = eventDiv.getAttribute('data-course-id');
+    const eventTitle = eventDiv.getAttribute('data-event-title');
+    const eventDate = (eventDiv.querySelector('.dimmed_text a') || {}).textContent || 'Data não encontrada';
+    
+    const linkElements = eventDiv.querySelectorAll('.description a');
+    const lastLinkElement = linkElements.length > 0 ? linkElements[linkElements.length - 1] : null;
+    
+    const eventLink = (lastLinkElement || {}).getAttribute('href') || 'Link não encontrado';
+    const dataEventIdMatch = eventLink.match(/id=(\d+)/);
+    const dataEventId = dataEventIdMatch ? dataEventIdMatch[1] : 'Nenhum ID encontrado';
+
+    return {
+      dataCourseId,
+      dataEventId,
+      eventTitle,
+      eventDate,
+      eventLink,
+    };
+  });
+};
 
 const Main = () => {
   const [matricula, setMatricula] = useState(localStorage.getItem("matricula"))
@@ -81,7 +106,7 @@ const Main = () => {
         const documento = document.createElement('html');
         const response = await api.get(`/getBoletim?token=${token}&id=${matricula}`);
         documento.innerHTML = response.data
-        setBoletim(toArray(documento.querySelector("table")).filter((periodo)=>{return periodo.items.length > 0})) 
+        setBoletim(cursesToArray(documento.querySelector("table")).filter((periodo)=>{return periodo.items.length > 0})) 
       } catch (error) {
         toast.error('Usuario ou senha incorretos', {position: "top-center", autoClose: 5000, hideProgressBar: false, closeOnClick: true, pauseOnHover: true, draggable: true, progress: undefined, theme: "colored",});
         localStorage.removeItem("matricula")
@@ -93,16 +118,13 @@ const Main = () => {
     if (token) {
       setLoading(true);
       let expires = new Date(localStorage.getItem("suap_expires"))
-      if(today < expires){
-        getBoletim()
-      }else{
+      if(today < expires)getBoletim()
+      else{
         localStorage.removeItem("token_suap")
         localStorage.removeItem("suap_expires")
         setLoading(false);
       }
-    }else{
-      setLoading(false);
-    }
+    }else setLoading(false);
   }, [token]);
   useEffect(() => {
     if (matricula && pass_suap && !token) login();

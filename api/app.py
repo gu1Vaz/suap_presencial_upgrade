@@ -1,6 +1,6 @@
 from flask import Flask,request
 from modules.Request import Request
-from enums import urls_suap, default_headers
+from enums import urls_suap, urls_presencial, default_headers
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -37,6 +37,16 @@ def loginSuap():
     token = fix_cookies(req.data)
 
     return token
+
+
+@app.route('/loginPresencial', methods=['POST'])
+def loginPresencial():
+    cookies = {"MoodleSession":"nonegui"}
+    payload = {'username':request.json.get('username'),
+           'password':request.json.get('password')}
+    req.setAll(urls_presencial["login"],"post", default_headers, payload, cookies)
+    req.new()
+    return req.data
 
 @app.route('/getBoletim', methods=['GET'])
 def getBoletim():
